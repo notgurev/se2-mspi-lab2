@@ -1,36 +1,44 @@
 #!bin/bash
-# red() {
-#     git config --local user.name red
-# 	git config --local user.email red@mail.com
-# }
-# blue() {
-#     git config --local user.name blue
-# 	git config --local user.email blue@mail.com
-# }
+REMOTE_URL="file://$(pwd -P)/origin"
+COMMITS=~/mspi2/commits
+
 commit() {
-# 	rm -rf *
-# 	cp ../commits/commit$1/* .
-# 	git commit --allow-empty -am r$1
+	svn delete *
+	cp $COMMITS/commit$1/* .
+	svn add * --force # force для каталогов
+	svn commit -m r$1 --username $2
 }
-# branch() {
-# 	git checkout $2 branch$1
-# }
-# merge() {
-# 	git merge branch$1 --no-commit
-# }
+new_branch() {
+	# Ветка - просто папка; добавляем в нее начальную ревизию
+	svn copy $REMOTE_URL/"$1" $REMOTE_URL/branches/branch"$2" -m "Add branch$2" --username "$3"
+}
+
+switch() {
+	# Переключение на ветку
+	svn switch $REMOTE_URL/branches/branch"$1"
+}
+
+merge() {
+	svn merge
+}
+
 # init
 rm -rf svnRepo
 mkdir svnRepo
 cd svnRepo
 
 svnadmin create origin
-REMOTE_URL="file://$(pwd -P)/origin"
-COMMITS=~/opi2/commits
-svn import $COMMITS/commit0 $REMOTE_URL/trunk -m 'r0' --username 'red'
+svn import $COMMITS/commit0 $REMOTE_URL/trunk -m "r0" --username "red"
 
-# 0
+# Создание рабочей копии
+svn checkout $REMOTE_URL/trunk working_copy
+cd working_copy
+
+# Создание папки с ветками
+svn mkdir $REMOTE_URL/branches -m 'Add branches' --username 'red' #создание ветки
 
 # 1
+
 
 # 2
 
