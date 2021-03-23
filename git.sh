@@ -1,10 +1,10 @@
 #!bin/bash
 red() {
-    	git config --local user.name red
+	git config --local user.name red
 	git config --local user.email red@mail.com
 }
 blue() {
-    	git config --local user.name blue
+	git config --local user.name blue
 	git config --local user.email blue@mail.com
 }
 commit() {
