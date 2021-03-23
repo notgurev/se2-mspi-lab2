@@ -1,30 +1,29 @@
 #!bin/bash
-REMOTE_URL="file://$(pwd -P)/origin"
-COMMITS=~/mspi2/commits
-CURRENT_USER=red
+# set -x; set -v
 
-red() {
-	CURRENT_USER=red
+red() { 
+	CURRENT_USER=red 
 }
-blue() {
-	CURRENT_USER=blue
+
+blue() { 
+	CURRENT_USER=blue 
 }
 
 commit() {
-	svn rm * # --force
+	svn rm * --force
 	cp $COMMITS/commit$1/* .
 	svn add * --force # force для каталогов
-	svn commit -m r$1 --username $2
+	svn commit -m r$1 --username $CURRENT_USER
 }
 
 branch_from_trunk() {
-	# Ветка - просто папка; добавляем в нее начальную ревизию
+	# Создание ветки из trunk
 	svn copy $REMOTE_URL/trunk $REMOTE_URL/branches/branch"$1" -m "Add branch$1" --username $CURRENT_USER
 }
 
 branch() {
-	# Ветка - просто папка; добавляем в нее начальную ревизию
-	svn copy $REMOTE_URL/branch"$1" $REMOTE_URL/branches/branch"$2" -m "Add branch$2" --username $CURRENT_USER
+	# Создание ветки
+	svn copy $REMOTE_URL/branches/branch"$1" $REMOTE_URL/branches/branch"$2" -m "Add branch$2" --username $CURRENT_USER
 }
 
 switch() {
@@ -33,29 +32,36 @@ switch() {
 }
 
 switch_to_trunk() {
-	# Переключение на ветку
-	svn switch $REMOTE_URL/branches/trunk
+	# Переключение на ветку trunk
+	svn switch $REMOTE_URL/trunk
 }
 
 merge() {
-	svn merge $REMOTE_URL/branches/branch"$1" --accept postpone
-	# svn resolve --accept working *
+	# Слияние в нынешнюю ветку
+	svn merge --non-interactive $REMOTE_URL/branches/branch"$1" 
+	svn resolved *
 }
 
 # init
-rm -rf svnRepo 
-mkdir svnRepo
-cd svnRepo
+rm -rf svn
+mkdir svn
+cd svn
 
-svnadmin create origin
-svn import $COMMITS/commit0 $REMOTE_URL/trunk -m "r0" --username $CURRENT_USER
+REMOTE_URL="file://$(pwd -P)/repo"
+COMMITS=~/mspi2/commits
+CURRENT_USER=red
+
+svnadmin create repo
+svn mkdir $REMOTE_URL/trunk $REMOTE_URL/branches -m "File structure" --username $CURRENT_USER
 
 # Создание рабочей копии
 svn checkout $REMOTE_URL/trunk working_copy
 cd working_copy
 
-# Создание папки с ветками
-svn mkdir $REMOTE_URL/branches -m 'Add branches' --username $CURRENT_USER
+# 0
+cp $COMMITS/commit0/* .
+svn add * --force
+svn commit -m r0 --username $CURRENT_USER
 
 # 1
 blue

@@ -1,27 +1,33 @@
 #!bin/bash
+
 red() {
 	git config --local user.name red
 	git config --local user.email red@mail.com
 }
+
 blue() {
 	git config --local user.name blue
 	git config --local user.email blue@mail.com
 }
+
 commit() {
 	rm -rf *
 	cp ../commits/commit$1/* .
 	git commit --allow-empty -am r$1
 }
+
 branch() {
 	git checkout $2 branch$1
 }
+
 merge() {
 	git merge branch$1 --no-commit
 }
+
 # init
-rm -rf gitRepo
-mkdir gitRepo
-cd gitRepo
+rm -rf git
+mkdir git
+cd git
 git init
 
 # 0
@@ -97,6 +103,7 @@ commit 16
 commit 17
 
 # 18
+red
 branch 11
 merge 3
 commit 18
@@ -151,7 +158,7 @@ commit 29
 # 30
 blue
 branch 30 -b
-merge 6
+# merge 6
 commit 30
 
 # 31
